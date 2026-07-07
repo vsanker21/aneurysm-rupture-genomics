@@ -112,20 +112,4 @@ Add your license here before public GitHub release.
 
 **Vivek Sanker** — [github.com/vsanker21](https://github.com/vsanker21)
 
-Suggested repository name: `aneurysm-rupture-genomics`
-
-### Publish to GitHub
-
-From the project root (requires [Git](https://git-scm.com/) in PATH):
-
-```bash
-git init
-git add run_pipeline.py pipeline/ project_paths.py requirements.txt README.md .gitignore
-git add *.py
-# Exclude data/results per .gitignore
-git commit -m "Add rupture genomics analysis pipeline (no manuscript generation)"
-
-gh repo create aneurysm-rupture-genomics --public --source=. --remote=origin --push
-```
-
-Or create an empty repo at [github.com/new](https://github.com/new) under [vsanker21](https://github.com/vsanker21), then push to `https://github.com/vsanker21/aneurysm-rupture-genomics.git`.
+**Live repository:** [github.com/vsanker21/aneurysm-rupture-genomics](https://github.com/vsanker21/aneurysm-rupture-genomics)
