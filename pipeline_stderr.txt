@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "E:\Aneurysms Genomics Project\comprehensive_analysis_pipeline.py", line 26, in <module>
+    from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+  File "C:\Users\vsanker\AppData\Roaming\Python\Python310\site-packages\sklearn\ensemble\__init__.py", line 6, in <module>
+    from ._bagging import BaggingClassifier, BaggingRegressor
+  File "C:\Users\vsanker\AppData\Roaming\Python\Python310\site-packages\sklearn\ensemble\_bagging.py", line 17, in <module>
+    from ..tree import DecisionTreeClassifier, DecisionTreeRegressor
+  File "C:\Users\vsanker\AppData\Roaming\Python\Python310\site-packages\sklearn\tree\__init__.py", line 6, in <module>
+    from ._classes import (
+  File "C:\Users\vsanker\AppData\Roaming\Python\Python310\site-packages\sklearn\tree\_classes.py", line 40, in <module>
+    from . import _criterion, _splitter, _tree
+  File "sklearn/tree/_criterion.pyx", line 1, in init sklearn.tree._criterion
+  File "sklearn/tree/_splitter.pyx", line 1, in init sklearn.tree._splitter
+  File "sklearn/tree/_tree.pyx", line 1, in init sklearn.tree._tree
+  File "C:\Users\vsanker\AppData\Roaming\Python\Python310\site-packages\sklearn\neighbors\__init__.py", line 7, in <module>
+    from ._base import VALID_METRICS, VALID_METRICS_SPARSE, sort_graph_by_row_values
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 879, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 975, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_data
+KeyboardInterrupt

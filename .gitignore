@@ -1,0 +1,43 @@
+# Large data and generated outputs (not versioned)
+data/
+results/
+Latest Submission Files/
+External Validation/
+Moya Moya/
+*.docx
+*.pdf
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.zip
+*.xlsx
+
+# Raw GEO dumps at repo root
+GSE*_*
+Human.GRCh38*
+
+# Python
+__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
+env/
+.env
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# R
+.Rhistory
+.RData
+
+# Logs and temp
+*.log
+_tmp_*
+terminals/

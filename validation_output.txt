@@ -1,0 +1,52 @@
+﻿================================================================================
+COMPREHENSIVE VALIDATION AND ANALYSIS USING REAL DATASETS
+================================================================================
+
+[OK] Loaded 50 prioritized genes
+
+================================================================================
+PATHWAY ENRICHMENT ANALYSIS
+================================================================================
+
+Loading existing pathway enrichment results: results/pathway_enrichment_prioritized_fdr_0.05.tsv
+  [OK] Loaded 4 enriched pathways
+
+  Top enriched pathways:
+    collagen-containing extracellular matrix           P=1.43e-02 Genes=3
+    basement membrane                                  P=3.37e-02 Genes=2
+    extracellular matrix                               P=3.93e-02 Genes=3
+    external encapsulating structure                   P=3.95e-02 Genes=3
+
+  Signature genes for enrichment: 35
+  Example genes: ['CPXM2', 'Ccd', 'MARCO', 'CABCOCO1', 'SIGLEC1', 'TGFBI', 'LAMA3', 'CDC14C', 'LOC105374059', 'SLC6A15']
+
+================================================================================
+BLOOD BIOMARKER PANEL DEVELOPMENT
+================================================================================
+
+  Blood-specific genes: 44
+
+  Loading blood expression data...
+    Expression: 66,023 genes, 54 samples
+    Metadata: 47 samples
+
+  Selected top 20 blood biomarker candidates:
+python : Traceback (most recent call last):
+At line:1 char:1
++ python comprehensive_validation_and_analysis.py 2>&1 | Out-File -Enco ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last) 
+   ::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "E:\Aneurysms Genomics 
+Project\comprehensive_validation_and_analysis.py", line 431, in <module>
+    main()
+  File "E:\Aneurysms Genomics 
+Project\comprehensive_validation_and_analysis.py", line 412, in main
+    biomarker_panel = develop_blood_biomarker_panel()
+  File "E:\Aneurysms Genomics 
+Project\comprehensive_validation_and_analysis.py", line 151, in 
+develop_blood_biomarker_panel
+    print(f"    {gene_info['Rank']:2d}. {gene_info['Gene_Symbol']:<15s} "
+ValueError: Invalid format specifier

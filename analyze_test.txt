@@ -1,0 +1,17 @@
+﻿python : E:\Aneurysms Genomics Project\analyze_gse122897.py:185: 
+RuntimeWarning: divide by zero encountered in log2
+At line:1 char:32
++ ... nv:PYTHONIOENCODING='utf-8'; python analyze_gse122897.py 2>&1 | Out-F ...
++                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (E:\Aneurysms Ge...untered in log2 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  log2_fc = np.log2(mean_group1 / mean_group2)
+E:\Aneurysms Genomics Project\analyze_gse122897.py:185: RuntimeWarning: divide 
+by zero encountered in log2
+  log2_fc = np.log2(mean_group1 / mean_group2)
+E:\Aneurysms Genomics Project\analyze_gse122897.py:185: RuntimeWarning: divide 
+by zero encountered in log2
+  log2_fc = np.log2(mean_group1 / mean_group2)
+================================================================================

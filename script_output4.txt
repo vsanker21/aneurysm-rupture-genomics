@@ -1,0 +1,13 @@
+﻿python : WARNING (pytensor.configdefaults): g++ not available, if using conda: 
+`conda install gxx`
+At line:1 char:1
++ python advanced_ml_ultra_hd_analyses.py 2>&1 | Out-File -FilePath scr ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING (pytens...da install gxx` 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING (pytensor.configdefaults): g++ not detected!  PyTensor will be unable 
+to compile C-implementations and will default to Python. Performance may be 
+severely degraded. To remove this warning, set PyTensor flags cxx to an empty 
+string.

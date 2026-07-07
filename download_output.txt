@@ -1,0 +1,28 @@
+﻿================================================================================
+PROGRAMMATIC DATASET DOWNLOAD
+================================================================================
+
+[1/4] GSE186927 - Single-cell RNA-seq
+--------------------------------------------------------------------------------
+  [OK] Exists: GSE186927_series_matrix.txt.gz
+  [DL] Trying GSE186927_raw_counts.tsv.gz
+python : Traceback (most recent call last):
+At line:1 char:1
++ python download_robust.py 2>&1 | Out-File -Encoding utf8 download_out ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last) 
+   ::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "E:\Aneurysms Genomics Project\download_robust.py", line 101, in 
+<module>
+    safe_download(url, gse_dir / pattern, f"Trying {pattern}", timeout=30)
+  File "E:\Aneurysms Genomics Project\download_robust.py", line 35, in 
+safe_download
+    response = requests.get(url, stream=True, timeout=timeout, 
+allow_redirects=True)
+  File "C:\Users\vsanker\AppData\Roaming\Python\Python310\site-packages\request
+s\api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "C:\Users\vsanker\AppData\Roaming\Python\Python310\site-packages\request
+s\api.py", line 59, in request

@@ -1,0 +1,4 @@
+Feature	Importance (%)	Description
+DE_Signature_Score	50.1	Differential expression signature score
+EC_Dysfunction_Score	26.9	Endothelial cell dysfunction score
+ECM_Remodeling_Score	20.6	Extracellular matrix remodeling score

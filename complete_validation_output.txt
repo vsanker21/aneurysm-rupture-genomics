@@ -1,0 +1,28 @@
+﻿================================================================================
+COMPLETE VALIDATION AND PATHWAY ANALYSIS - REAL DATA ONLY
+================================================================================
+
+================================================================================
+PATHWAY ENRICHMENT ANALYSIS - REAL SIGNATURE GENES
+================================================================================
+
+  Loaded 50 prioritized genes from real data
+python : Traceback (most recent call last):
+At line:1 char:1
++ python complete_validation_pathway_analysis.py 2>&1 | Out-File -Encod ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last) 
+   ::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "E:\Aneurysms Genomics 
+Project\complete_validation_pathway_analysis.py", line 534, in <module>
+    main()
+  File "E:\Aneurysms Genomics 
+Project\complete_validation_pathway_analysis.py", line 484, in main
+    enriched_pathways, signature_genes = perform_pathway_enrichment_real_data()
+  File "E:\Aneurysms Genomics 
+Project\complete_validation_pathway_analysis.py", line 61, in 
+perform_pathway_enrichment_real_data
+    entrez_str = str(int(entrez))
+ValueError: invalid literal for int() with base 10: 'ENSG00000261722'

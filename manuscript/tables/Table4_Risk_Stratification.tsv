@@ -1,0 +1,4 @@
+Risk Category	N Samples	Rupture Rate	Score Range
+Low	10	20.0% (2/10)	< 0.33
+Medium	21	38.1% (8/21)	0.33 - 0.67
+High	12	100.0% (12/12)	> 0.67

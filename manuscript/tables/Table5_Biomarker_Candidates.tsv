@@ -1,0 +1,5 @@
+Marker_Name	RNA_Type	Log2FC	P_adj_BH	Status	Function
+Candidate_1	Protein_coding	2.88	4.080e-02	Novel	To be validated
+Candidate_2	Protein_coding	-2.07	4.080e-02	Novel	To be validated
+miR-155	miRNA	1.40	9.928e-02	Known	inflammatory response
+hsa_circ_0007990	circRNA	1.26	9.925e-02	Known	endothelial dysfunction
