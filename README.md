@@ -4,9 +4,7 @@ Reproducible end-to-end analysis for intracranial aneurysm rupture transcriptomi
 tissue discovery (GSE122897), immune-adjusted DE, 300-gene shortlist, blood-bridge
 panel derivation, external cohort validation, and supplementary tables/figures.
 
-**This repository is analysis-only.** Manuscript Word document generation
-(`create_*manuscript*.py`, submission docx patching) is intentionally excluded
-from `run_pipeline.py`.
+**This repository is analysis-only.** 
 
 ## Requirements
 
