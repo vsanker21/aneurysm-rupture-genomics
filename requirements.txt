@@ -1,0 +1,15 @@
+# Core analysis
+pandas>=2.0
+numpy>=1.24
+scipy>=1.10
+statsmodels>=0.14
+scikit-learn>=1.3
+matplotlib>=3.7
+seaborn>=0.13
+requests>=2.28
+
+# Optional: manuscript scripts only (not required for run_pipeline.py)
+# python-docx>=1.0
+
+# R (system dependency, not pip):
+#   DESeq2 (Bioconductor) — run_deseq2_gse122897.py / run_deseq2_gse122897.R

@@ -1,0 +1,9 @@
+DESeq2 GSE122897 confirmation (PRIMARY = explicit GEO labels, 21 vs 21)
+=============================
+Total genes tested: 28037
+padj < 0.05: 3094
+padj < 0.05 AND |log2FC| >= 0.5: 2454
+Source: results/gse122897_deseq2_results.tsv
+Frozen 22 vs 21 (includes GSM3487892 as ruptured): results/deseq2_gse122897_as_submitted_22v21/
+GSM3487892 excluded because GEO source_name is Unknown rupture status.
+Panel and 300-gene shortlist membership were not rebuilt (see sensitivity_decision.json).

@@ -1,0 +1,36 @@
+GSE122897 discovery phenotype decision
+======================================
+
+Primary analysis: 21 ruptured vs 21 unruptured.
+Rule: explicit GEO source_name only
+  - "Ruptured intracranial aneurysm"
+  - "Unruptured intracranial aneurysm"
+Excluded: GSM3487892 (Unknown rupture status) and GSM3487858 (Unknown intracranial aneurysm).
+
+Frozen as-submitted run (22 vs 21, GSM3487892 coded as ruptured by substring match):
+  results/deseq2_gse122897_as_submitted_22v21/
+
+Why not rebuild the eight-gene panel or the 300-gene shortlist
+-------------------------------------------------------------
+All six wall-core genes keep the same DESeq2 sign and remain padj < 0.05.
+
+All eight panel genes still pass the scientific joint filters
+(DESeq2 padj ≤ 0.05 and immune-adjusted P ≤ 0.05). Discovery signs are unchanged.
+
+TMEM130's joint-filter rank among genes passing both filters moved from 299 to 365,
+so it would fall outside a recapped top-300. That 300 cap in
+run_phases_g_evidence_pipeline.py is "--max-genes ... Cap eQTL API queries",
+not a biological significance threshold. TMEM130 remains padj = 0.017. Frozen 22 vs 21 OLS immune P = 0.004; 21 vs 21 OLS immune P = 0.008. Both remain < 0.05. Replacing TMEM130 with GDF7 because of a rank shuffle at an
+API cap would change a pre-specified panel without a scientific eligibility failure.
+
+Shortlist Jaccard vs a recapped 300 is 0.82 (29 genes in/out), as expected at a
+soft rank cutoff. K = 4 wall-core genes in the shortlist (TGFBI, MPP1, MARCO,
+CPXM2) remain inside the 300.
+
+Sensitivity: six-gene core signs/padj and eight-gene panel eligibility are
+unchanged if GSM3487892 is retained as ruptured (22 vs 21).
+
+DESeq2 counts
+-------------
+22 vs 21 (frozen): 28,128 genes; 2,764 padj<0.05; 2,184 with |log2FC|≥0.5
+21 vs 21 (primary): 28,037 genes; 3,094 padj<0.05; 2,454 with |log2FC|≥0.5

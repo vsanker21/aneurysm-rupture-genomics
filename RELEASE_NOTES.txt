@@ -1,0 +1,10 @@
+Aneurysm rupture genomics analysis code v1.1.0
+==============================================
+
+This archive contains the analysis scripts used in the paper.
+Primary GSE122897 contrast: 21 ruptured vs 21 unruptured, assigned from
+exact GEO source_name labels. GSM3487892 is excluded. Phenotype assignment
+does not use grepl("Ruptured|ruptured", ...).
+
+Raw GEO files are not included. Place them under data/ as described in README.md.
+Companion processed tables: https://doi.org/10.5281/zenodo.21249929
