@@ -115,8 +115,8 @@ Blood bridge: directional concordance in GSE159610 and GSE106520, Stouffer
 ranking. Panel: top 8 concordant genes; Phases 2–4 held out in performance
 reporting.
 
-Code: GitHub release tag `v1.1.0`. Processed tables:
-https://doi.org/10.5281/zenodo.21249929.
+Code: GitHub release tag `v1.1.0`; software DOI https://doi.org/10.5281/zenodo.23676142.
+Processed tables: https://doi.org/10.5281/zenodo.21249929.
 
 ## License
 
