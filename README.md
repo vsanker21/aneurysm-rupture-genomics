@@ -94,13 +94,29 @@ are used when present; the `external` stage skips missing cohorts gracefully.
 
 Run those separately if needed for publication packaging.
 
+## GSE122897 phenotype (primary 21 vs 21)
+
+Primary discovery contrast is **21 ruptured vs 21 unruptured**. Labels are the
+exact GEO `source_name` strings `Ruptured intracranial aneurysm` and
+`Unruptured intracranial aneurysm`. GSM3487892 (Unknown rupture status) is
+excluded. Cortical artery samples and GSM3487858 are excluded. **18 of 60**
+series specimens are excluded; 42 are analysed. Phenotype assignment does
+**not** use `grepl("Ruptured|ruptured", ...)`.
+
+The sample table is `metadata/gse122897_sample_metadata_explicit_21v21.tsv`.
+A frozen 22 vs 21 as-submitted run (GSM3487892 coded ruptured by substring
+match) is retained only as a sensitivity archive.
+
 ## Citation / methods summary
 
-Discovery: GSE122897 wall RNA-seq (22 ruptured vs 21 unruptured), DESeq2 +
+Discovery: GSE122897 wall RNA-seq (21 ruptured vs 21 unruptured), DESeq2 +
 LM22-adjusted OLS shortlist (padj ≤ 0.05 and immune-adjusted P ≤ 0.05).
 Blood bridge: directional concordance in GSE159610 and GSE106520, Stouffer
 ranking. Panel: top 8 concordant genes; Phases 2–4 held out in performance
 reporting.
+
+Code: GitHub release tag `v1.1.0`. Processed tables:
+https://doi.org/10.5281/zenodo.21249929.
 
 ## License
 

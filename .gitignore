@@ -16,6 +16,8 @@ Moya Moya/
 # Raw GEO dumps at repo root
 GSE*_*
 Human.GRCh38*
+!metadata/
+!metadata/**
 
 # Python
 __pycache__/
@@ -41,3 +43,12 @@ Thumbs.db
 *.log
 _tmp_*
 terminals/
+zenodo_deposit/
+zenodo_deposit.zip
+paper_code_release/
+.release_worktree/
+
+# Submission correspondence and tokens — never publish
+Nature Files/
+*Token.txt
+*.token

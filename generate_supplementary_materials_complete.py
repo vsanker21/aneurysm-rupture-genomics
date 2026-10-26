@@ -44,6 +44,14 @@ OUT_DOCX = BASE / "Supplementary_Materials_Complete.docx"
 
 PANEL_GENES = ["DYNLT1", "OASL", "MPP1", "TMEM130", "MARCO", "MCOLN1", "RNASET2", "ANK3"]
 TISSUE_CORE_6 = ["TGFBI", "ANPEP", "MPP1", "MARCO", "CLEC5A", "CPXM2"]
+CORE_ENTREZ = {
+    "TGFBI": "7045",
+    "ANPEP": "290",
+    "MPP1": "4354",
+    "MARCO": "8685",
+    "CLEC5A": "23601",
+    "CPXM2": "119587",
+}
 DPI = 600
 
 mpl.rcParams.update({
@@ -69,7 +77,7 @@ def _save_table(df: pd.DataFrame, name: str) -> Path:
 def _bootstrap_auc_ci(
     labels: np.ndarray,
     scores: np.ndarray,
-    n_boot: int = 1500,
+    n_boot: int = 2000,
     seed: int = 42,
 ) -> tuple[float, float, float]:
     labels = np.asarray(labels, dtype=bool)
@@ -108,7 +116,7 @@ def build_table_s1(m: dict) -> tuple[pd.DataFrame, pd.DataFrame, str]:
             N_negative=m["n_unruptured"],
             N_total=m["n_samples"],
             Age_mean_SD="Not in GEO metadata",
-            Sex_pct_female="1/43 samples with sex field (not analysable)",
+            Sex_pct_female="1/42 samples with sex field (not analysable)",
             Hypertension_pct="Not reported",
             Aneurysm_size_location="Not reported",
             Clinical_presentation="Resected aneurysm wall at surgery (ruptured or unruptured)",
@@ -321,13 +329,12 @@ def build_table_s1(m: dict) -> tuple[pd.DataFrame, pd.DataFrame, str]:
         row["GSE54083_array"] = "Yes" if gene != "ANK3" else "Probe mapping uncertain"
         row["GSE13353_GPL570"] = "Yes" if gene in {"MARCO", "TGFBI", "MPP1"} else "Check probes"
         row["GSE36791_GPL10558"] = "Yes"
-        row["GSE73378_GPL10558"] = "Yes" if gene != "ANK3" else "No — absent from array"
+        row["GSE73378_GPL10558"] = "Yes" if gene != "MPP1" else "No — absent from array"
         row["GSE75436_GPL570"] = "Yes"
         row["GSE66238_RNAseq"] = "Yes"
         row["Notes"] = (
-            "ANK3 absent on GSE73378 array (7/8 genes measurable); "
-            "main-text footnote applies to GSE73378."
-            if gene == "ANK3"
+            "MPP1 absent on GSE73378 array (7/8 genes measurable)."
+            if gene == "MPP1"
             else ""
         )
         coverage.append(row)
@@ -479,7 +486,7 @@ def build_table_s3() -> tuple[pd.DataFrame, str]:
     p106 = perf.loc[perf["Dataset"] == "GSE106520", "AUC"].iloc[0]
     legend = (
         f"Phase 1 blood-bridge cohorts: composite panel AUROC = {p159:.3f} (GSE159610) and {p106:.3f} (GSE106520), "
-        f"exceeding most single-gene AUROCs. Bootstrap 95% CIs (1,500 resamples) reflect modest sample sizes "
+        f"exceeding most single-gene AUROCs. Bootstrap 95% CIs (2,000 resamples) reflect modest sample sizes "
         f"(n=23/24 and n=16/16). ANK3 shows the highest single-gene AUROC in GSE159610 (0.705) but not in GSE106520."
     )
     return out, legend
@@ -501,7 +508,7 @@ def build_table_s4(m: dict) -> tuple[pd.DataFrame, str]:
             des = des.merge(sym_map, on="Gene_ID", how="left")
     n_sig = int((des["padj"] < 0.05).sum()) if "padj" in des.columns else m["deseq2_padj_genes"]
     legend = (
-        f"Full DESeq2 output for GSE122897 (n=22 ruptured vs 21 unruptured). "
+        f"Full DESeq2 output for GSE122897 (n=21 ruptured vs 21 unruptured; GSM3487892 unknown rupture status excluded). "
         f"{n_sig:,} genes with padj < 0.05. Complete table archived as TSV ({len(des):,} rows)."
     )
     return des, legend
@@ -523,40 +530,89 @@ def build_table_s5() -> tuple[pd.DataFrame, str]:
     return out, legend
 
 
+def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
+    p = np.asarray(pvals, dtype=float)
+    n = len(p)
+    order = np.argsort(p)
+    ranked = p[order]
+    q = ranked * n / np.arange(1, n + 1)
+    q = np.minimum.accumulate(q[::-1])[::-1]
+    out = np.empty(n, dtype=float)
+    out[order] = np.clip(q, 0.0, 1.0)
+    return out
+
+
+def _gse122897_core_signs() -> dict[str, float]:
+    de = pd.read_csv(BASE / "results/gse122897_deseq2_results.tsv", sep="\t")
+    de["Gene_ID"] = de["Gene_ID"].astype(str).str.strip('"').str.replace(r"\.0$", "", regex=True)
+    signs: dict[str, float] = {}
+    for gene, entrez in CORE_ENTREZ.items():
+        hit = pd.to_numeric(de.loc[de["Gene_ID"] == entrez, "log2FoldChange"], errors="coerce")
+        if hit.notna().any():
+            signs[gene] = float(np.sign(hit.iloc[0]))
+    return signs
+
+
 def build_table_s6() -> tuple[pd.DataFrame, str]:
-    path = BASE / "results/external_validation_gse15629/gse15629_shortlist_overlap_rupture.tsv"
-    ov = pd.read_csv(path, sep="\t")
+    """GSE15629 six-gene wall-core concordance on the S10 log2(intensity+1) Welch scale.
+
+    The stored gene-level matrix is linear Affymetrix intensity (GPL6244; p95 ~ 62).
+    gse15629_shortlist_overlap_rupture.tsv labelled Mean_R − Mean_U on that linear
+    scale as Log2FC_RvU, which produced TGFBI +100 etc. ANPEP and CLEC5A are on
+    the platform; they were missing from S6 only because that overlap file is
+    restricted to the 300-gene shortlist. S10's survey loader applies log2(x+1)
+    when p95 > 50. S6 now uses the same transform and the same 8R vs 6U contrast.
+    """
+    expr = pd.read_csv(
+        BASE / "results/external_validation_gse15629/gse15629_gene_level_expression.tsv",
+        sep="\t",
+        index_col=0,
+    )
+    meta = pd.read_csv(
+        BASE / "results/external_validation_gse15629/gse15629_sample_metadata.tsv",
+        sep="\t",
+    )
+    expr = np.log2(expr.astype(float) + 1.0)
+    r_cols = [c for c in meta.loc[meta["Group"] == "Ruptured", "Sample"].tolist() if c in expr.columns]
+    u_cols = [c for c in meta.loc[meta["Group"] == "Unruptured", "Sample"].tolist() if c in expr.columns]
+    signs = _gse122897_core_signs()
+
     rows = []
     for gene in TISSUE_CORE_6:
-        hit = ov[ov["Gene"] == gene]
-        if len(hit):
-            r = hit.iloc[0]
+        if gene not in expr.index:
             rows.append({
                 "Gene": gene,
-                "Measurable_on_GSE15629": "Yes",
-                "Log2FC_RvU": r.get("Log2FC_RvU"),
-                "P_value": r.get("P_value"),
-                "FDR_BH": r.get("FDR_BH"),
-                "DirectionMatch_GSE122897": r.get("DirectionMatch_GSE122897"),
-            })
-        else:
-            rows.append({
-                "Gene": gene,
-                "Measurable_on_GSE15629": "No / not in annotated overlap",
+                "Measurable_on_GSE15629": "No",
                 "Log2FC_RvU": np.nan,
                 "P_value": np.nan,
                 "FDR_BH": np.nan,
                 "DirectionMatch_GSE122897": np.nan,
             })
+            continue
+        av = pd.to_numeric(expr.loc[gene, r_cols], errors="coerce").dropna().to_numpy(dtype=float)
+        bv = pd.to_numeric(expr.loc[gene, u_cols], errors="coerce").dropna().to_numpy(dtype=float)
+        lfc = float(np.mean(av) - np.mean(bv))
+        _, p_val = stats.ttest_ind(av, bv, equal_var=False, nan_policy="omit")
+        disc = signs.get(gene, np.nan)
+        match = bool(np.sign(lfc) == disc) if pd.notna(disc) and lfc != 0 else np.nan
+        rows.append({
+            "Gene": gene,
+            "Measurable_on_GSE15629": "Yes",
+            "Log2FC_RvU": lfc,
+            "P_value": float(p_val),
+            "FDR_BH": np.nan,
+            "DirectionMatch_GSE122897": match,
+        })
     core = pd.DataFrame(rows)
-    measurable = core[core["Measurable_on_GSE15629"] == "Yes"]
-    n_match = int(measurable["DirectionMatch_GSE122897"].fillna(False).sum())
-    n_meas = len(measurable)
+    measurable = core["Measurable_on_GSE15629"] == "Yes"
+    core.loc[measurable, "FDR_BH"] = _bh_fdr(core.loc[measurable, "P_value"].to_numpy())
+    n_match = int(core.loc[measurable, "DirectionMatch_GSE122897"].fillna(False).astype(bool).sum())
+    n_meas = int(measurable.sum())
     legend = (
-        f"GSE15629 rupture subset (8 ruptured vs 6 unruptured): {n_match}/{n_meas} measurable "
-        f"six-gene wall-core genes directionally concordant with GSE122897. "
-        f"ANPEP and CLEC5A were not present in the annotated GSE15629 overlap table; "
-        f"TGFBI, MPP1, MARCO, and CPXM2 showed concordant directions (4/4 measurable)."
+        f"GSE15629 rupture subset (8 ruptured vs 6 unruptured). Values are Welch log2 fold-changes "
+        f"after log2(intensity+1), the same estimator as Supplementary Table S10. "
+        f"All six wall-core genes are measurable on GPL6244; {n_match}/{n_meas} are directionally "
+        f"concordant with GSE122897 DESeq2."
     )
     return core, legend
 
@@ -577,7 +633,7 @@ def build_table_s8() -> tuple[pd.DataFrame, str]:
     frac = pd.read_csv(BASE / "results/cibersortx/lm22_fractions_gse122897.tsv", sep="\t")
     legend = (
         f"Per-sample LM22+NNLS immune fractions for all {len(frac)} GSE122897 wall samples "
-        f"(22 ruptured, 21 unruptured). Used as covariates in immune-adjusted gene-wise OLS."
+        f"(CIBERSORTx mixture; GSM3487892 has unknown GEO rupture status and was excluded from DESeq2). Used as covariates in immune-adjusted gene-wise OLS."
     )
     return frac, legend
 
@@ -640,31 +696,45 @@ def build_table_s11(m: dict) -> tuple[pd.DataFrame, str]:
 
 
 def build_table_s12() -> tuple[pd.DataFrame, str]:
-    """Hypergeometric overlap: 8-gene blood panel vs 6-gene wall core."""
+    """Hypergeometric overlap: 8-gene blood panel vs wall-core genes eligible in each background.
+
+    Primary analysis uses K = 4 (wall-core genes present in the 300-gene shortlist:
+    TGFBI, MPP1, MARCO, CPXM2). ANPEP and CLEC5A are in the six-gene wall core but
+    absent from the shortlist, so the panel could not have selected them.
+    """
     panel_set = set(PANEL_GENES)
     core_set = set(TISSUE_CORE_6)
     overlap = len(panel_set & core_set)
+    # Eligible wall-core genes inside the pre-specified shortlist
+    shortlist_path = BASE / "results" / "phases_g" / "shortlist_evidence.tsv"
+    if shortlist_path.is_file():
+        sl_symbols = set(pd.read_csv(shortlist_path, sep="\t")["symbol"].astype(str))
+        eligible_core = sorted(core_set & sl_symbols)
+    else:
+        eligible_core = ["TGFBI", "MPP1", "MARCO", "CPXM2"]
+    k_eligible = len(eligible_core)
     shortlist_n = 300
     anchor_n = 645
     tested_n = 14888
-    universe_sizes = [
-        ("Primary shortlist (pre-specified N)", shortlist_n),
-        ("DESeq2+immune nominal pool (uncapped)", anchor_n),
-        ("All genes immune-model tested", tested_n),
+    # scipy hypergeom(M, n, N): M=population, n=success states in pop, N=draws
+    # Here: M=Background_N, n=Eligible_wall_core_K, N=panel size
+    specs = [
+        ("Primary shortlist (eligible wall-core K=4)", shortlist_n, k_eligible),
+        ("DESeq2+immune nominal pool (uncapped); K=4 eligible", anchor_n, k_eligible),
+        ("All genes immune-model tested; K=6 full wall core", tested_n, 6),
     ]
     rows = []
-    for label, N in universe_sizes:
-        K = 8  # panel size
-        n = 6  # core size
+    panel_n = 8
+    for label, N, K in specs:
         x = overlap
-        p = hypergeom.sf(x - 1, N, n, K) if x > 0 else 1.0
-        expected = (K * n) / N if N else float("nan")
+        p = hypergeom.sf(x - 1, N, K, panel_n) if x > 0 else 1.0
+        expected = (panel_n * K) / N if N else float("nan")
         enrich = x / expected if expected and expected > 0 else float("nan")
         rows.append({
             "Background_definition": label,
             "Background_N": N,
-            "Panel_size_k": K,
-            "Wall_core_size_n": n,
+            "Panel_size_n": panel_n,
+            "Eligible_wall_core_K": K,
             "Observed_overlap": x,
             "Expected_overlap": round(expected, 3),
             "Fold_enrichment": round(enrich, 2),
@@ -672,8 +742,11 @@ def build_table_s12() -> tuple[pd.DataFrame, str]:
         })
     out = pd.DataFrame(rows)
     legend = (
-        f"Convergence of 8-gene blood panel with 6-gene wall core (observed overlap = {overlap}: MPP1, MARCO). "
-        f"Hypergeometric P values are sensitive to background N; primary analysis uses N=300 shortlist."
+        f"Convergence of 8-gene blood panel with wall rupture core (observed overlap = {overlap}: MPP1, MARCO). "
+        f"Primary test uses N=300 and K={k_eligible} eligible wall-core genes present in the shortlist "
+        f"({', '.join(eligible_core)}); ANPEP and CLEC5A are excluded from K because they are absent from "
+        f"the shortlist and could not have been selected into the panel. "
+        f"Hypergeometric P values remain sensitive to background N."
     )
     return out, legend
 
@@ -779,24 +852,46 @@ def figure_s2_roc_grid() -> Path:
 def figure_s3_volcano_core() -> Path:
     des = pd.read_csv(BASE / "results/gse122897_deseq2_results.tsv", sep="\t")
     des.columns = [c.strip('"') for c in des.columns]
+    des["Gene_ID"] = des["Gene_ID"].astype(str).str.strip('"').str.replace(r"\.0$", "", regex=True)
     des["neglog10"] = -np.log10(des["padj"].clip(lower=1e-300))
+    entrez_to_core = {eid: gene for gene, eid in CORE_ENTREZ.items()}
+    des["Gene_Symbol"] = des["Gene_ID"].map(entrez_to_core)
     sig = des["padj"] < 0.05
     fig, ax = plt.subplots(figsize=(9, 7))
     ax.scatter(des.loc[~sig, "log2FoldChange"], des.loc[~sig, "neglog10"], c="#aaa", s=8, alpha=0.4, rasterized=True)
     ax.scatter(des.loc[sig, "log2FoldChange"], des.loc[sig, "neglog10"], c="#c44", s=10, alpha=0.5, rasterized=True)
-    ann = pd.read_csv(BASE / "results/gse122897_deseq2_top_annotated.tsv", sep="\t")
-    sym_map = dict(zip(ann["Gene_ID"].astype(str).str.strip('"'), ann["Gene_Symbol"]))
-    des["sym"] = des["Gene_ID"].astype(str).str.strip('"').map(sym_map)
+    # Offset CPXM2 left so the downregulated label is not lost on the negative arm.
+    offsets = {
+        "TGFBI": (8, 8),
+        "ANPEP": (14, 10),
+        "MPP1": (10, 4),
+        "MARCO": (8, 12),
+        "CLEC5A": (14, -16),
+        "CPXM2": (-10, 12),
+    }
     for g in TISSUE_CORE_6:
-        sub = des[des["sym"] == g]
-        if len(sub):
-            ax.scatter(sub["log2FoldChange"], sub["neglog10"], c="#1a5", s=80, edgecolors="black", zorder=5)
-            ax.annotate(g, (sub["log2FoldChange"].iloc[0], sub["neglog10"].iloc[0]),
-                        fontsize=9, fontweight="bold", xytext=(5, 5), textcoords="offset points")
+        sub = des[des["Gene_Symbol"] == g]
+        if sub.empty:
+            continue
+        sub = sub.sort_values("padj").iloc[[0]]
+        x = float(sub["log2FoldChange"].iloc[0])
+        y = float(sub["neglog10"].iloc[0])
+        ax.scatter([x], [y], c="#1a5", s=80, edgecolors="black", zorder=5)
+        dx, dy = offsets.get(g, (6, 6))
+        ax.annotate(
+            g,
+            (x, y),
+            fontsize=9,
+            fontweight="bold",
+            xytext=(dx, dy),
+            textcoords="offset points",
+            ha="right" if dx < 0 else "left",
+            arrowprops={"arrowstyle": "-", "color": "black", "lw": 0.6} if abs(dx) > 20 or abs(dy) > 12 else None,
+        )
     ax.axhline(-np.log10(0.05), ls="--", c="k", lw=0.8)
     ax.set_xlabel("log2 fold change (ruptured vs unruptured)")
     ax.set_ylabel("-log10(adjusted P)")
-    ax.set_title(f"Supplementary Figure S3. GSE122897 DESeq2 volcano (6-gene wall core labelled; {sig.sum():,} padj<0.05)")
+    ax.set_title(f"Supplementary Figure S3. GSE122897 DESeq2 volcano (6-gene wall core labelled; {int(sig.sum()):,} padj<0.05)")
     fig.tight_layout()
     path = FIG_DIR / "SuppFig3_deseq2_volcano_wall_core.png"
     fig.savefig(path, dpi=DPI, bbox_inches="tight", facecolor="white")
@@ -941,7 +1036,7 @@ Predictors: (1) Three tissue signature scores + ridge logistic model; (2) eight-
 
 Sample size: Discovery n={m['n_samples']}; external arms vary (Table S1). Event per variable not met for high-dimensional models; nested CV AUC {m['auc_nested_mean']:.2f} +/- {m['auc_nested_sd']:.2f} reported as primary performance estimate.
 
-Missing data: Samples with unknown rupture status excluded (17 of 60 in GSE122897). No imputation of clinical covariates.
+Missing data: Samples without an explicit ruptured or unruptured GEO source name excluded (18 of 60 in GSE122897: 16 cortical artery controls, GSM3487858 unknown intracranial aneurysm, GSM3487892 unknown rupture status). Analysed n = 21 vs 21. No imputation of clinical covariates.
 
 Statistical methods: DESeq2, Welch tests, LM22-adjusted OLS, permutation importance, bootstrap AUROC (Table S3). Hypergeometric test for panel overlap (Table S12).
 

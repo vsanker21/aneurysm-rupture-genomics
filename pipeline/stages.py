@@ -32,7 +32,7 @@ def _all_stages() -> list[Stage]:
         ),
         Stage(
             name="deseq2",
-            description="DESeq2 ruptured vs unruptured on GSE122897 raw counts (R)",
+            description="DESeq2 21 vs 21 on GSE122897 (explicit GEO source_name; R)",
             scripts=("run_deseq2_gse122897.py",),
             requires=(
                 "data/sc_rnaseq/GSE122897/GSE122897_raw_counts_GRCh38.p13_NCBI.tsv.gz",

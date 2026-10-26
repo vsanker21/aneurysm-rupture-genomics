@@ -13,10 +13,10 @@ import pandas as pd
 
 def load_story_metrics(base: Path) -> dict:
     m: dict = {
-        "n_samples": 43,
-        "n_ruptured": 22,
+        "n_samples": 42,
+        "n_ruptured": 21,
         "n_unruptured": 21,
-        "deseq2_padj_genes": 2764,
+        "deseq2_padj_genes": 3094,
         "welch_fdr_genes": 4,
         "pathways_fdr05": 207,
         "auc_full_cohort": 0.827,
