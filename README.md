@@ -121,7 +121,8 @@ symbols, and applies BH-FDR across the full overlap. The six-gene wall core
 is genes concordant in all three cohorts with meta FDR < 1e-6: TGFBI, ANPEP,
 MARCO, MPP1, CLEC5A, CTSL.
 
-Code: GitHub release tag `v1.1.1`. Processed tables:
+Code: GitHub release tag `v1.1.1`; software DOI
+https://doi.org/10.5281/zenodo.23700289. Processed tables:
 https://doi.org/10.5281/zenodo.21249929.
 
 ## License
