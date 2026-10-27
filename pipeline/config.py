@@ -5,7 +5,7 @@ import os
 import sys
 from pathlib import Path
 
-PIPELINE_VERSION = "1.1.0"
+PIPELINE_VERSION = "1.1.1"
 
 # Ensure repo root is importable when running `python -m pipeline` or `run_pipeline.py`.
 _REPO_ROOT = Path(__file__).resolve().parent.parent

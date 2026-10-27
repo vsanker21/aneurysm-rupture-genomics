@@ -115,8 +115,14 @@ Blood bridge: directional concordance in GSE159610 and GSE106520, Stouffer
 ranking. Panel: top 8 concordant genes; Phases 2–4 held out in performance
 reporting.
 
-Code: GitHub release tag `v1.1.0`; software DOI https://doi.org/10.5281/zenodo.23676142.
-Processed tables: https://doi.org/10.5281/zenodo.21249929.
+Three-cohort Stouffer meta-analysis maps GSE122897 Entrez IDs with
+`metadata/hgnc_entrez_to_symbol.tsv`, joins GSE54083 and GSE13353 on HGNC
+symbols, and applies BH-FDR across the full overlap. The six-gene wall core
+is genes concordant in all three cohorts with meta FDR < 1e-6: TGFBI, ANPEP,
+MARCO, MPP1, CLEC5A, CTSL.
+
+Code: GitHub release tag `v1.1.1`. Processed tables:
+https://doi.org/10.5281/zenodo.21249929.
 
 ## License
 

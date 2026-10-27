@@ -7,7 +7,7 @@ from pathlib import Path
 
 BASE = Path(r"E:\Aneurysms Genomics Project")
 OUT = BASE / "paper_code_release"
-ZIP_PATH = BASE / "aneurysm-rupture-genomics-v1.1.0.zip"
+ZIP_PATH = BASE / "aneurysm-rupture-genomics-v1.1.1.zip"
 
 FILES = [
     ".gitignore",
@@ -23,8 +23,10 @@ FILES = [
     "run_deseq2_gse122897.py",
     "run_deseq2_gse122897_21v21_explicit.R",
     "metadata/gse122897_sample_metadata_explicit_21v21.tsv",
+    "metadata/hgnc_entrez_to_symbol.tsv",
     "metadata/PHENOTYPE_DECISION.txt",
     "metadata/DESeq2_count_confirmation.txt",
+    "metadata/README_stouffer_v1.1.1.txt",
     "download_phases_g_public_data.py",
     "prepare_cibersortx_mixture_gse122897.py",
     "rewrite_cibersortx_mixture_to_gsm.py",
@@ -84,12 +86,17 @@ def main() -> None:
         copied.append(rel)
 
     (OUT / "RELEASE_NOTES.txt").write_text(
-        "Aneurysm rupture genomics analysis code v1.1.0\n"
+        "Aneurysm rupture genomics analysis code v1.1.1\n"
         "==============================================\n\n"
         "This archive contains the analysis scripts used in the paper.\n"
         "Primary GSE122897 contrast: 21 ruptured vs 21 unruptured, assigned from\n"
         "exact GEO source_name labels. GSM3487892 is excluded. Phenotype assignment\n"
         "does not use grepl(\"Ruptured|ruptured\", ...).\n\n"
+        "v1.1.1 maps GSE122897 Entrez IDs with metadata/hgnc_entrez_to_symbol.tsv\n"
+        "so the Stouffer meta-analysis joins the full overlap with GSE54083 and\n"
+        "GSE13353 (12,521 genes on this HGNC snapshot). BH-FDR is applied across\n"
+        "that overlap. The six-gene wall core is genes concordant in all three\n"
+        "cohorts with meta FDR < 1e-6: TGFBI, ANPEP, MARCO, MPP1, CLEC5A, CTSL.\n\n"
         "Raw GEO files are not included. Place them under data/ as described in README.md.\n"
         "Companion processed tables: https://doi.org/10.5281/zenodo.21249929\n",
         encoding="utf-8",
@@ -101,7 +108,7 @@ def main() -> None:
     with zipfile.ZipFile(ZIP_PATH, "w", zipfile.ZIP_DEFLATED) as zf:
         for f in OUT.rglob("*"):
             if f.is_file():
-                zf.write(f, Path("aneurysm-rupture-genomics-v1.1.0") / f.relative_to(OUT))
+                zf.write(f, Path("aneurysm-rupture-genomics-v1.1.1") / f.relative_to(OUT))
 
     print("copied", len(copied))
     if missing:

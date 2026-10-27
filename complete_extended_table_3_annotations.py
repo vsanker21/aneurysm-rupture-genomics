@@ -33,7 +33,7 @@ G106_META = BASE / "results/external_validation_gse106520/gse106520_sample_metad
 G159610_DE = BASE / "results/gse159610_full_de_results_annotated.tsv"
 
 PANEL_GENES = {"DYNLT1", "OASL", "MPP1", "TMEM130", "MARCO", "MCOLN1", "RNASET2", "ANK3"}
-WALL_CORE = {"TGFBI", "ANPEP", "MPP1", "MARCO", "CLEC5A", "CPXM2"}
+WALL_CORE = {"TGFBI", "ANPEP", "MPP1", "MARCO", "CLEC5A", "CTSL"}
 
 DISPLAY_COLUMNS = [
     "Shortlist_rank",

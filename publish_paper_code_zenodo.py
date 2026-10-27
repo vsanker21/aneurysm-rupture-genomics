@@ -1,4 +1,4 @@
-"""Create Zenodo v1.1.0 software record (new version of 23479356 if possible)."""
+"""Create Zenodo v1.1.1 software record (new version of 23676142)."""
 from __future__ import annotations
 
 import json
@@ -9,9 +9,9 @@ from pathlib import Path
 import requests
 
 BASE = Path(r"E:\Aneurysms Genomics Project")
-ZIP_PATH = BASE / "aneurysm-rupture-genomics-v1.1.0.zip"
+ZIP_PATH = BASE / "aneurysm-rupture-genomics-v1.1.1.zip"
 API = "https://zenodo.org/api"
-PARENT_RECORD = "23479356"
+PARENT_RECORD = "23676142"
 TOKEN_CANDIDATES = [
     BASE / "Latest Submission Files" / "Aneurysm_Genomics_Token.txt",
     BASE / "Nature Files" / "Zenodo.txt",
@@ -33,17 +33,19 @@ def load_token() -> str:
 def software_metadata() -> dict:
     return {
         "title": (
-            "Analysis code v1.1.0: concordance-first transcriptomic screening "
+            "Analysis code v1.1.1: concordance-first transcriptomic screening "
             "for intracranial aneurysm rupture (GSE122897 21 vs 21)"
         ),
         "upload_type": "software",
         "description": (
-            "Version 1.1.0 of the paper analysis code. Primary GSE122897 contrast is "
-            "21 ruptured vs 21 unruptured using exact GEO source_name labels. "
-            "GSM3487892 (Unknown rupture status) is excluded. Phenotype assignment "
-            "does not use grepl substring matching. Companion processed tables: "
+            "Version 1.1.1 of the paper analysis code. GSE122897 Entrez IDs are mapped "
+            "to HGNC symbols so the three-cohort Stouffer meta-analysis joins the full "
+            "overlap with GSE54083 and GSE13353. BH-FDR is applied across that overlap. "
+            "The six-gene wall core is TGFBI, ANPEP, MARCO, MPP1, CLEC5A, and CTSL "
+            "(concordant in all three cohorts, meta FDR < 1e-6). Primary GSE122897 "
+            "contrast remains 21 ruptured vs 21 unruptured. Companion processed tables: "
             "https://doi.org/10.5281/zenodo.21249929. Source repository: "
-            "https://github.com/vsanker21/aneurysm-rupture-genomics (release tag v1.1.0)."
+            "https://github.com/vsanker21/aneurysm-rupture-genomics (release tag v1.1.1)."
         ),
         "creators": [{"name": "Sanker, Vivek"}],
         "keywords": [
@@ -53,7 +55,7 @@ def software_metadata() -> dict:
             "GSE122897",
             "gene panel",
         ],
-        "version": "1.1.0",
+        "version": "1.1.1",
         "license": "cc-by-4.0",
         "related_identifiers": [
             {
@@ -63,13 +65,13 @@ def software_metadata() -> dict:
                 "resource_type": "dataset",
             },
             {
-                "identifier": "https://github.com/vsanker21/aneurysm-rupture-genomics/releases/tag/v1.1.0",
+                "identifier": "https://github.com/vsanker21/aneurysm-rupture-genomics/releases/tag/v1.1.1",
                 "relation": "isIdenticalTo",
                 "scheme": "url",
                 "resource_type": "software",
             },
             {
-                "identifier": "10.5281/zenodo.23479356",
+                "identifier": "10.5281/zenodo.23676142",
                 "relation": "isNewVersionOf",
                 "scheme": "doi",
                 "resource_type": "software",
@@ -156,7 +158,7 @@ def main() -> None:
     print("DOI", doi)
     print("record", rec)
     print("id", out.get("id"))
-    Path(r"E:\Aneurysms Genomics Project\metadata\ZENODO_CODE_DOI_v1.1.0.txt").write_text(
+    Path(r"E:\Aneurysms Genomics Project\metadata\ZENODO_CODE_DOI_v1.1.1.txt").write_text(
         f"DOI: https://doi.org/{doi}\nRecord: {rec}\nDeposition: {out.get('id')}\n",
         encoding="utf-8",
     )
