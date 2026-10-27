@@ -43,14 +43,14 @@ FIG_DIR = BASE / "results" / "figures" / "supplementary"
 OUT_DOCX = BASE / "Supplementary_Materials_Complete.docx"
 
 PANEL_GENES = ["DYNLT1", "OASL", "MPP1", "TMEM130", "MARCO", "MCOLN1", "RNASET2", "ANK3"]
-TISSUE_CORE_6 = ["TGFBI", "ANPEP", "MPP1", "MARCO", "CLEC5A", "CPXM2"]
+TISSUE_CORE_6 = ["TGFBI", "ANPEP", "MARCO", "MPP1", "CLEC5A", "CTSL"]
 CORE_ENTREZ = {
     "TGFBI": "7045",
     "ANPEP": "290",
-    "MPP1": "4354",
     "MARCO": "8685",
+    "MPP1": "4354",
     "CLEC5A": "23601",
-    "CPXM2": "119587",
+    "CTSL": "1514",
 }
 DPI = 600
 
@@ -699,7 +699,7 @@ def build_table_s12() -> tuple[pd.DataFrame, str]:
     """Hypergeometric overlap: 8-gene blood panel vs wall-core genes eligible in each background.
 
     Primary analysis uses K = 4 (wall-core genes present in the 300-gene shortlist:
-    TGFBI, MPP1, MARCO, CPXM2). ANPEP and CLEC5A are in the six-gene wall core but
+    TGFBI, MPP1, MARCO, CTSL). ANPEP and CLEC5A are in the six-gene wall core but
     absent from the shortlist, so the panel could not have selected them.
     """
     panel_set = set(PANEL_GENES)
@@ -711,7 +711,7 @@ def build_table_s12() -> tuple[pd.DataFrame, str]:
         sl_symbols = set(pd.read_csv(shortlist_path, sep="\t")["symbol"].astype(str))
         eligible_core = sorted(core_set & sl_symbols)
     else:
-        eligible_core = ["TGFBI", "MPP1", "MARCO", "CPXM2"]
+        eligible_core = ["TGFBI", "MPP1", "MARCO", "CTSL"]
     k_eligible = len(eligible_core)
     shortlist_n = 300
     anchor_n = 645
@@ -860,14 +860,13 @@ def figure_s3_volcano_core() -> Path:
     fig, ax = plt.subplots(figsize=(9, 7))
     ax.scatter(des.loc[~sig, "log2FoldChange"], des.loc[~sig, "neglog10"], c="#aaa", s=8, alpha=0.4, rasterized=True)
     ax.scatter(des.loc[sig, "log2FoldChange"], des.loc[sig, "neglog10"], c="#c44", s=10, alpha=0.5, rasterized=True)
-    # Offset CPXM2 left so the downregulated label is not lost on the negative arm.
     offsets = {
         "TGFBI": (8, 8),
         "ANPEP": (14, 10),
         "MPP1": (10, 4),
         "MARCO": (8, 12),
         "CLEC5A": (14, -16),
-        "CPXM2": (-10, 12),
+        "CTSL": (10, -12),
     }
     for g in TISSUE_CORE_6:
         sub = des[des["Gene_Symbol"] == g]
@@ -1002,7 +1001,7 @@ def build_word_document(artifacts: dict) -> None:
     fig_specs = [
         ("s1", "Supplementary Figure S1. Individual panel-gene expression in Phase 1 blood cohorts (GSE159610, GSE106520). Violin/box plots show signed expression (discovery direction) for each of the eight genes. The composite panel outperforms most single genes in AUROC (Table S3).", 6.5),
         ("s2", "Supplementary Figure S2. Single-gene ROC curves for eight panel genes in GSE159610 (top row) and GSE106520 (bottom row). Curves confirm heterogeneous per-gene discrimination; no single gene matches the composite panel AUROC in both cohorts.", 6.5),
-        ("s3", "Supplementary Figure S3. DESeq2 volcano plot for GSE122897 with the six-gene wall rupture core highlighted. Green points: TGFBI, ANPEP, MPP1, MARCO, CLEC5A, CPXM2; background shows genome-wide significant genes (padj < 0.05).", 5.5),
+        ("s3", "Supplementary Figure S3. DESeq2 volcano plot for GSE122897 with the six-gene wall rupture core highlighted. Green points: TGFBI, ANPEP, MARCO, MPP1, CLEC5A, CTSL; background shows genome-wide significant genes (padj < 0.05).", 5.5),
         ("s4", "Supplementary Figure S4. CIBERSORTx/LM22 deconvolution of wall tissue. Panel A: heatmap of 22 immune fractions (43 samples). Panel B: correlation vs RMSE per sample (median correlation 0.14), indicating weak fit of blood-derived reference to aneurysm wall.", 6.0),
         ("s5", "Supplementary Figure S5. MPP1 and MARCO signed log2 fold changes across all ten surveyed cohort comparisons. Green bars: same direction as GSE122897 discovery; red: discordant. Tissue rupture cohorts show consistent positive shifts for both genes.", 6.5),
     ]

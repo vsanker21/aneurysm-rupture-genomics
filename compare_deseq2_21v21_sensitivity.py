@@ -25,10 +25,10 @@ CORE = {
     "MPP1": "4354",
     "MARCO": "8685",
     "CLEC5A": "23601",
-    "CPXM2": "119587",
+    "CTSL": "1514",
 }
 PANEL = ["DYNLT1", "OASL", "MPP1", "TMEM130", "MARCO", "MCOLN1", "RNASET2", "ANK3"]
-CORE_IN_SHORTLIST = ["TGFBI", "MPP1", "MARCO", "CPXM2"]
+CORE_IN_SHORTLIST = ["TGFBI", "MPP1", "MARCO", "CTSL"]
 
 
 def _gid(s: pd.Series) -> pd.Series:

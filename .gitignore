@@ -18,6 +18,8 @@ GSE*_*
 Human.GRCh38*
 !metadata/
 !metadata/**
+metadata/hgnc_complete_set.txt
+metadata/Homo_sapiens.gene_info.gz
 
 # Python
 __pycache__/

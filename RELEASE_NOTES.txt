@@ -1,10 +1,16 @@
-Aneurysm rupture genomics analysis code v1.1.0
+Aneurysm rupture genomics analysis code v1.1.1
 ==============================================
 
 This archive contains the analysis scripts used in the paper.
 Primary GSE122897 contrast: 21 ruptured vs 21 unruptured, assigned from
 exact GEO source_name labels. GSM3487892 is excluded. Phenotype assignment
 does not use grepl("Ruptured|ruptured", ...).
+
+v1.1.1 maps GSE122897 Entrez IDs with metadata/hgnc_entrez_to_symbol.tsv
+so the Stouffer meta-analysis joins the full overlap with GSE54083 and
+GSE13353 (12,521 genes on this HGNC snapshot). BH-FDR is applied across
+that overlap. The six-gene wall core is genes concordant in all three
+cohorts with meta FDR < 1e-6: TGFBI, ANPEP, MARCO, MPP1, CLEC5A, CTSL.
 
 Raw GEO files are not included. Place them under data/ as described in README.md.
 Companion processed tables: https://doi.org/10.5281/zenodo.21249929

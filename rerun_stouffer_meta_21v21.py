@@ -1,8 +1,9 @@
 """Weighted Stouffer meta on primary GSE122897 DESeq2 (21 vs 21 explicit labels).
 
-GSE54083 and GSE13353 inputs are unchanged. Genome-wide BH-FDR is recomputed
-on the overlapping gene set so FDR for the six-gene core is not taken from the
-22 vs 21 run.
+GSE122897 Entrez IDs are mapped to HGNC symbols with metadata/hgnc_entrez_to_symbol.tsv
+before an inner join to GSE54083 and GSE13353. BH-FDR is computed across the full
+three-cohort overlap. The six-gene wall core is the genes that are directionally
+concordant in all three cohorts with Meta_FDR_BH < 1e-6.
 """
 from __future__ import annotations
 
@@ -15,11 +16,12 @@ from scipy.stats import norm
 from statsmodels.stats.multitest import multipletests
 
 from generate_supplementary_materials_complete import CORE_ENTREZ, TISSUE_CORE_6
-from manuscript_results_detail import annotate_deseq2_with_symbols, load_gene_symbol_map
 
 BASE = Path(r"E:\Aneurysms Genomics Project")
 OUT = BASE / "results" / "deseq2_gse122897_21v21_explicit"
 CORE_OUT = OUT / "six_gene_stouffer_meta_21v21.tsv"
+HGNC_MAP = BASE / "metadata" / "hgnc_entrez_to_symbol.tsv"
+FDR_CORE_MAX = 1e-6
 
 
 def _effective_n(n_case: int, n_control: int) -> float:
@@ -31,22 +33,32 @@ def _signed_z(lfc: pd.Series, p: pd.Series) -> pd.Series:
     return np.sign(lfc).replace(0, np.nan) * norm.isf(p.clip(lower=eps) / 2.0)
 
 
+def _load_hgnc_map(path: Path) -> pd.Series:
+    m = pd.read_csv(path, sep="\t", dtype=str)
+    entrez_col = next(c for c in m.columns if c.lower() in {"entrez_id", "entrez", "gene_id", "ncbigene"})
+    symbol_col = next(c for c in m.columns if c.lower() in {"symbol", "gene_symbol", "hgnc_symbol", "gene"})
+    m[entrez_col] = m[entrez_col].astype(str).str.replace(r"\.0$", "", regex=True)
+    m[symbol_col] = m[symbol_col].astype(str).str.strip()
+    m = m[(m[entrez_col] != "") & (m[symbol_col] != "") & (m[symbol_col] != "nan")]
+    return m.drop_duplicates(entrez_col).set_index(entrez_col)[symbol_col]
+
+
 def main() -> None:
     de = pd.read_csv(BASE / "results/gse122897_deseq2_results.tsv", sep="\t")
     de["Gene_ID"] = de["Gene_ID"].astype(str).str.strip('"').str.replace(r"\.0$", "", regex=True)
-    sym = load_gene_symbol_map(BASE)
-    de = annotate_deseq2_with_symbols(de, sym)
-    entrez_to_core = {v: k for k, v in CORE_ENTREZ.items()}
-    de["display_symbol"] = de["Gene_ID"].map(entrez_to_core).fillna(de["display_symbol"])
+    hgnc = _load_hgnc_map(HGNC_MAP)
+    de["Gene"] = de["Gene_ID"].map(hgnc)
+    force = {v: k for k, v in CORE_ENTREZ.items()}
+    de["Gene"] = de["Gene_ID"].map(force).fillna(de["Gene"])
+    de = de.dropna(subset=["Gene"]).drop_duplicates("Gene")
 
-    g122 = de[["display_symbol", "log2FoldChange", "pvalue", "padj"]].rename(
+    g122 = de[["Gene", "log2FoldChange", "pvalue", "padj"]].rename(
         columns={
-            "display_symbol": "Gene",
             "log2FoldChange": "Log2FC_GSE122897",
             "pvalue": "P_GSE122897",
             "padj": "FDR_GSE122897",
         }
-    ).drop_duplicates("Gene")
+    )
 
     g540 = pd.read_csv(
         BASE / "results/external_validation_gse54083/gse54083_gene_level_validation.tsv",
@@ -93,9 +105,11 @@ def main() -> None:
         & (np.sign(merged["Log2FC_GSE122897"]) == np.sign(merged["Log2FC_GSE13353"]))
     )
 
-    core = merged[merged["Gene"].isin(TISSUE_CORE_6)].copy()
-    core["Gene"] = pd.Categorical(core["Gene"], TISSUE_CORE_6, ordered=True)
-    core = core.sort_values("Gene")
+    derived = merged[
+        merged["All_three_directionally_concordant"] & (merged["Meta_FDR_BH"] < FDR_CORE_MAX)
+    ].copy()
+    derived = derived.sort_values(["Meta_FDR_BH", "Gene"])
+
     keep = [
         "Gene",
         "Log2FC_GSE122897",
@@ -115,7 +129,11 @@ def main() -> None:
         "Meta_FDR_BH",
         "All_three_directionally_concordant",
     ]
+    core = merged[merged["Gene"].isin(TISSUE_CORE_6)].copy()
+    core["Gene"] = pd.Categorical(core["Gene"], TISSUE_CORE_6, ordered=True)
+    core = core.sort_values("Gene")
     core[keep].to_csv(CORE_OUT, sep="\t", index=False)
+    derived[keep].to_csv(OUT / "six_gene_stouffer_meta_21v21_derived.tsv", sep="\t", index=False)
     merged.to_csv(OUT / "rupture_consensus_meta_all_21v21.tsv", sep="\t", index=False)
 
     n_conc = int(
@@ -129,14 +147,17 @@ def main() -> None:
         "GSE122897_weight": _effective_n(n122_r, n122_u),
         "n_overlap": int(len(merged)),
         "n_concordant_fdr_lt_0.05": n_conc,
+        "n_concordant_fdr_lt_1e-6": int(len(derived)),
+        "derived_core": derived["Gene"].astype(str).tolist(),
+        "tissue_core_6": TISSUE_CORE_6,
         "core": core[keep].to_dict(orient="records"),
     }
     (OUT / "six_gene_stouffer_meta_21v21.json").write_text(
         json.dumps(summary, indent=2, default=str), encoding="utf-8"
     )
-    print(core[keep].to_string(index=False))
     print("n_overlap", len(merged), "concordant FDR<0.05", n_conc)
-    print("weight 21v21", _effective_n(21, 21), "weight 22v21", _effective_n(22, 21))
+    print("derived core FDR<1e-6", derived["Gene"].tolist())
+    print(core[keep].to_string(index=False))
 
 
 if __name__ == "__main__":
